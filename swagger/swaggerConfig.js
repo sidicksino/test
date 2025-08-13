@@ -10,7 +10,9 @@ const options = {
     },
     servers: [
       {
-        url: 'http://localhost:4000',
+        url: process.env.NODE_ENV === 'production'
+          ? 'https://mon-backend.onrender.com'
+          : 'http://localhost:4000',
       },
     ],
     components: {
