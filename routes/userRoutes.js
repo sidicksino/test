@@ -65,4 +65,36 @@ router.post('/register', usrerControllers.register);
  */
 router.post('/login', usrerControllers.login);
 
+
+/**
+ * @swagger
+ * /api/user/admin/register:
+ *   post:
+ *     summary: Register a new Admin
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               phone_number:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *             required:
+ *               - password
+ *     responses:
+ *       201:
+ *         description: Admin created successfully
+ *       400:
+ *         description: Missing fields or conflict
+ *       500:
+ *         description: Server error
+ */
+router.post('/admin/register', usrerControllers.adminRegister);
+
 module.exports = router;
