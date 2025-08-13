@@ -22,12 +22,15 @@ dotenv.config();
 require('./config/passport');
 const port = process.env.PORT || 5000;
 
-// CORS
+// cors
 app.use(cors({
-  origin: '*', // Autorise toutes les origines (pratique pour Swagger et tests)
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  origin: '*',
+  methods: ['GET','POST','PUT','DELETE','PATCH','OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+
+//Réponse aux requêtes pré-vol
+app.options('*', cors());
 
 // Middlewares
 app.use(express.json());
