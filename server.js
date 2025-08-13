@@ -24,7 +24,7 @@ const port = process.env.PORT || 5000;
 
 // cors
 app.use(cors({
-  origin: '*',
+  origin: ['http://localhost:4000', 'https://test-uwzj.onrender.com'],
   methods: ['GET','POST','PUT','DELETE','PATCH','OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
