@@ -14,7 +14,7 @@ const options = {
           ? 'https://test-uwzj.onrender.com'
           : 'http://localhost:4000',
       },
-    ],
+    ],    
     components: {
       securitySchemes: {
         bearerAuth: {
