@@ -11,7 +11,7 @@ const options = {
     servers: [
       {
         url: process.env.NODE_ENV === 'production'
-          ? 'https://mon-backend.onrender.com'
+          ? 'https://test-uwzj.onrender.com'
           : 'http://localhost:4000',
       },
     ],
