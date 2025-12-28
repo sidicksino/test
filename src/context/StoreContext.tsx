@@ -12,9 +12,12 @@ interface StoreContextType {
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
+// Define API URL based on environment or hardcode for simplicity as requested
+const API_URL = 'https://test-1-5811.onrender.com';
+
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [medicines, setMedicines] = useState<Medicine[]>([]);
-// 2. Transactions
+  // 2. Transactions
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   useEffect(() => {
@@ -24,8 +27,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const fetchData = async () => {
     try {
       const [medsRes, txRes] = await Promise.all([
-        fetch('http://localhost:3000/api/medicines'),
-        fetch('http://localhost:3000/api/transactions')
+        fetch(`${API_URL}/api/medicines`),
+        fetch(`${API_URL}/api/transactions`)
       ]);
 
       const medsData = await medsRes.json();
@@ -44,7 +47,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { id, ...newMed } = medicine;
       
-      const res = await fetch('http://localhost:3000/api/medicines', {
+      const res = await fetch(`${API_URL}/api/medicines`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newMed)
@@ -58,7 +61,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const updateMedicine = async (id: string, updated: Partial<Medicine>) => {
     try {
-      const res = await fetch(`http://localhost:3000/api/medicines/${id}`, {
+      const res = await fetch(`${API_URL}/api/medicines/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updated)
@@ -72,7 +75,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const deleteMedicine = async (id: string) => {
     try {
-      await fetch(`http://localhost:3000/api/medicines/${id}`, { method: 'DELETE' });
+      await fetch(`${API_URL}/api/medicines/${id}`, { method: 'DELETE' });
       setMedicines(prev => prev.filter(m => m.id !== id));
     } catch (error) {
       console.error("Error deleting medicine:", error);
@@ -81,7 +84,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const processTransaction = async (cartItems: { id: string; quantity: number }[], total: number) => {
     try {
-       const res = await fetch('http://localhost:3000/api/transactions', {
+       const res = await fetch(`${API_URL}/api/transactions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ items: cartItems, totalAmount: total })
