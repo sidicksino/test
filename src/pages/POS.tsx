@@ -52,11 +52,11 @@ const POS = () => {
   };
 
   return (
-    <div className="flex gap-6 h-[calc(100vh-140px)]">
+    <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-140px)] lg:h-[calc(100vh-140px)] h-auto overflow-y-auto lg:overflow-hidden">
       {/* Product Grid */}
-      <div className="flex-1 flex flex-col gap-6">
+      <div className="flex-1 flex flex-col gap-6 h-full overflow-hidden">
         {/* Search */}
-        <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+        <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 shrink-0">
           <div className="relative">
             <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input 
@@ -70,12 +70,12 @@ const POS = () => {
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 overflow-y-auto pr-2 pb-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 overflow-y-auto pr-2 pb-2 flex-1">
           {filteredProducts.map(product => (
             <div 
               key={product.id} 
               onClick={() => addToCart(product)}
-              className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 cursor-pointer hover:shadow-md hover:border-blue-200 transition-all group"
+              className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 cursor-pointer hover:shadow-md hover:border-blue-200 transition-all group shrink-0"
             >
               <div className="flex justify-between items-start mb-2">
                 <span className="px-2 py-1 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold">
@@ -91,7 +91,7 @@ const POS = () => {
       </div>
 
       {/* Cart Sidebar */}
-      <div className="w-96 bg-white rounded-2xl shadow-lg border border-slate-100 flex flex-col">
+      <div className="w-full lg:w-96 bg-white rounded-2xl shadow-lg border border-slate-100 flex flex-col h-[500px] lg:h-full shrink-0">
         <div className="p-6 border-b border-slate-100">
           <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
             <ShoppingCart className="w-5 h-5" />

@@ -47,26 +47,26 @@ const Inventory = () => {
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[calc(100vh-140px)]">
       {/* Toolbar */}
-      <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-        <div className="flex gap-4 items-center">
-          <div className="relative">
+      <div className="p-4 md:p-6 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center w-full md:w-auto">
+          <div className="relative w-full sm:w-auto">
             <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input 
               type="text" 
               placeholder="Search medicines..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 w-64"
+              className="pl-10 pr-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 w-full sm:w-64"
             />
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-600">
+          <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-600 w-full sm:w-auto justify-center">
             <Filter className="w-4 h-4" />
             <span>Filter</span>
           </button>
         </div>
         <button 
           onClick={openAddModal}
-          className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition-all active:scale-95 font-medium"
+          className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition-all active:scale-95 font-medium w-full md:w-auto justify-center"
         >
           <Plus className="w-5 h-5" />
           Add Medicine
@@ -75,7 +75,8 @@ const Inventory = () => {
 
       {/* Table */}
       <div className="flex-1 overflow-auto">
-        <table className="w-full text-left border-collapse">
+        <div className="min-w-[800px] md:min-w-0"> {/* Min width to force horizontal scroll on mobile if needed */}
+          <table className="w-full text-left border-collapse">
           <thead className="bg-slate-50 sticky top-0 z-10">
             <tr>
               <th className="px-6 py-4 font-semibold text-slate-600 text-sm">Medicine Name</th>
@@ -130,6 +131,7 @@ const Inventory = () => {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
 
       {/* Add/Edit Modal */}

@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
-import { Bell, Search } from 'lucide-react';
+import { Bell, Search, Menu } from 'lucide-react';
 
 const Layout = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   
   const getPageTitle = () => {
@@ -17,12 +19,20 @@ const Layout = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
-      <Sidebar />
-      <main className="flex-1 ml-64 p-8">
-        <header className="flex justify-between items-center mb-8 bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
-          <div>
-            <h2 className="text-2xl font-bold text-slate-800">{getPageTitle()}</h2>
-            <p className="text-slate-500 text-sm">Welcome back, Dr. Sarah</p>
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <main className="flex-1 md:ml-64 p-4 md:p-8 transition-all duration-300">
+        <header className="flex justify-between items-center mb-6 md:mb-8 bg-white p-4 rounded-2xl shadow-sm border border-slate-100 sticky top-0 z-10">
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => setSidebarOpen(true)}
+              className="md:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-lg"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+            <div>
+              <h2 className="text-xl md:text-2xl font-bold text-slate-800">{getPageTitle()}</h2>
+              <p className="text-slate-500 text-sm hidden md:block">Welcome back, Dr. Sarah</p>
+            </div>
           </div>
           
           <div className="flex items-center gap-6">
