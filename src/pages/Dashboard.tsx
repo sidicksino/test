@@ -10,16 +10,32 @@ const Dashboard = () => {
   const totalStock = medicines.reduce((acc, curr) => acc + curr.stock, 0);
   const lowStockItems = medicines.filter(m => m.stock <= m.minStockAlert).length;
   
-  // Dummy data for the chart since we don't have historical data yet
-  const chartData = [
-    { name: 'Mon', sales: 4000 },
-    { name: 'Tue', sales: 3000 },
-    { name: 'Wed', sales: 2000 },
-    { name: 'Thu', sales: 2780 },
-    { name: 'Fri', sales: 1890 },
-    { name: 'Sat', sales: 2390 },
-    { name: 'Sun', sales: 3490 },
-  ];
+  // Calculate daily revenue for the chart
+  const getLast7Days = () => {
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      days.push(d.toISOString().split('T')[0]);
+    }
+    return days;
+  };
+
+  const chartData = getLast7Days().map(date => {
+    const daySales = transactions
+      .filter(t => t.timestamp.startsWith(date))
+      .reduce((acc, curr) => acc + curr.totalAmount, 0);
+    
+    return {
+      name: new Date(date).toLocaleDateString('en-US', { weekday: 'short' }),
+      sales: daySales
+    };
+  });
+
+  const today = new Date().toISOString().split('T')[0];
+  const todayRevenue = transactions
+    .filter(t => t.timestamp.startsWith(today))
+    .reduce((acc, curr) => acc + curr.totalAmount, 0);
 
   return (
     <div className="space-y-8">
@@ -29,7 +45,7 @@ const Dashboard = () => {
           title="Total Sales" 
           value={`$${totalSales.toFixed(2)}`} 
           icon={DollarSign} 
-          trend="12.5%" 
+          trend="Lifetime" 
           trendUp={true} 
           color="green"
         />
@@ -37,7 +53,7 @@ const Dashboard = () => {
           title="Total Inventory" 
           value={totalStock} 
           icon={Package} 
-          trend="5%" 
+          trend="Items" 
           trendUp={true} 
           color="blue"
         />
@@ -49,10 +65,10 @@ const Dashboard = () => {
         />
         <StatCard 
           title="Daily Revenue" 
-          value="$1,240" 
+          value={`$${todayRevenue.toFixed(2)}`} 
           icon={TrendingUp} 
-          trend="2.1%" 
-          trendUp={false} 
+          trend="Today" 
+          trendUp={todayRevenue > 0} 
           color="blue"
         />
       </div>
@@ -60,7 +76,7 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Chart Section */}
         <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-          <h3 className="text-lg font-bold text-slate-800 mb-6">Revenue Analytics</h3>
+          <h3 className="text-lg font-bold text-slate-800 mb-6">Revenue Analytics (Last 7 Days)</h3>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData}>

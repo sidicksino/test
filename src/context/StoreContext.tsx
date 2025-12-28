@@ -12,69 +12,88 @@ interface StoreContextType {
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
-const INITIAL_MEDICINES: Medicine[] = [
-  { id: '1', name: 'Paracetamol 500mg', category: 'Painkiller', price: 5.0, stock: 120, expiryDate: '2025-12-01', minStockAlert: 50 },
-  { id: '2', name: 'Amoxicillin 250mg', category: 'Antibiotic', price: 12.5, stock: 45, expiryDate: '2024-08-15', minStockAlert: 20 },
-  { id: '3', name: 'Ibuprofen 400mg', category: 'Painkiller', price: 8.0, stock: 85, expiryDate: '2026-01-20', minStockAlert: 30 },
-  { id: '4', name: 'Cetirizine 10mg', category: 'Antihistamine', price: 4.5, stock: 200, expiryDate: '2025-05-10', minStockAlert: 40 },
-  { id: '5', name: 'Vitamin C 1000mg', category: 'Supplement', price: 15.0, stock: 15, expiryDate: '2024-11-30', minStockAlert: 20 },
-];
-
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [medicines, setMedicines] = useState<Medicine[]>(() => {
-    const saved = localStorage.getItem('medicines');
-    return saved ? JSON.parse(saved) : INITIAL_MEDICINES;
-  });
-
-  const [transactions, setTransactions] = useState<Transaction[]>(() => {
-    const saved = localStorage.getItem('transactions');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [medicines, setMedicines] = useState<Medicine[]>([]);
+// 2. Transactions
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   useEffect(() => {
-    localStorage.setItem('medicines', JSON.stringify(medicines));
-  }, [medicines]);
+    fetchData();
+  }, []);
 
-  useEffect(() => {
-    localStorage.setItem('transactions', JSON.stringify(transactions));
-  }, [transactions]);
+  const fetchData = async () => {
+    try {
+      const [medsRes, txRes] = await Promise.all([
+        fetch('http://localhost:3000/api/medicines'),
+        fetch('http://localhost:3000/api/transactions')
+      ]);
 
-  const addMedicine = (medicine: Medicine) => {
-    setMedicines(prev => [...prev, medicine]);
+      const medsData = await medsRes.json();
+      const txData = await txRes.json();
+
+      setMedicines(medsData);
+      setTransactions(txData);
+    } catch (error) {
+      console.error("Failed to fetch data:", error);
+    }
   };
 
-  const updateMedicine = (id: string, updated: Partial<Medicine>) => {
-    setMedicines(prev => prev.map(m => m.id === id ? { ...m, ...updated } : m));
+  const addMedicine = async (medicine: Medicine) => {
+    try {
+      // Omit ID since database generates it
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { id, ...newMed } = medicine;
+      
+      const res = await fetch('http://localhost:3000/api/medicines', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newMed)
+      });
+      const savedMed = await res.json();
+      setMedicines(prev => [...prev, savedMed]);
+    } catch (error) {
+      console.error("Error adding medicine:", error);
+    }
   };
 
-  const deleteMedicine = (id: string) => {
-    setMedicines(prev => prev.filter(m => m.id !== id));
+  const updateMedicine = async (id: string, updated: Partial<Medicine>) => {
+    try {
+      const res = await fetch(`http://localhost:3000/api/medicines/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated)
+      });
+      const updatedMed = await res.json();
+      setMedicines(prev => prev.map(m => m.id === id ? updatedMed : m));
+    } catch (error) {
+       console.error("Error updating medicine:", error);
+    }
   };
 
-  const processTransaction = (cartItems: { id: string; quantity: number }[], total: number) => {
-    // 1. Update stock
-    setMedicines(prev => prev.map(m => {
-      const item = cartItems.find(c => c.id === m.id);
-      if (item) {
-        return { ...m, stock: m.stock - item.quantity };
+  const deleteMedicine = async (id: string) => {
+    try {
+      await fetch(`http://localhost:3000/api/medicines/${id}`, { method: 'DELETE' });
+      setMedicines(prev => prev.filter(m => m.id !== id));
+    } catch (error) {
+      console.error("Error deleting medicine:", error);
+    }
+  };
+
+  const processTransaction = async (cartItems: { id: string; quantity: number }[], total: number) => {
+    try {
+       const res = await fetch('http://localhost:3000/api/transactions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: cartItems, totalAmount: total })
+      });
+      
+      if (res.ok) {
+        // Refresh entire state to ensure accurate stock and history
+        fetchData();
       }
-      return m;
-    }));
-
-    // 2. Create transaction record
-    const fullItems = cartItems.map(c => {
-      const med = medicines.find(m => m.id === c.id)!;
-      return { ...med, quantity: c.quantity };
-    });
-
-    const newTransaction: Transaction = {
-      id: crypto.randomUUID(),
-      timestamp: new Date().toISOString(),
-      items: fullItems,
-      totalAmount: total,
-    };
-
-    setTransactions(prev => [newTransaction, ...prev]);
+    } catch (error) {
+      console.error("Error processing transaction:", error);
+    }
   };
 
   return (
